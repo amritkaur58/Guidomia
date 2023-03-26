@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.onEach
 
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
+class MainActivity : AppCompatActivity() {
     private lateinit var carAdapter: CarAdapter
     private var carList: List<CarTableDetail> = listOf()
     private lateinit var binding: ActivityMainBinding
@@ -34,8 +34,70 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        binding.makeET.setOnQueryTextListener(this)
-        binding.modelET.setOnQueryTextListener(this)
+        binding.makeET.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                try {
+                    carAdapter.fromMake = true
+                    carAdapter.fromModel = false
+                    carAdapter.filter.filter(query)
+                    carAdapter.notifyDataSetChanged()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                return false
+
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onQueryTextChange(newText: String?): Boolean {
+                try {
+                    carAdapter.filter.filter(newText)
+                    carAdapter.notifyDataSetChanged()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                return false
+            }
+
+        })
+
+        binding.modelET.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                try {
+                    carAdapter.fromMake = false
+                    carAdapter.fromModel = true
+                    carAdapter.filter.filter(query)
+                    carAdapter.notifyDataSetChanged()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                return false
+
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onQueryTextChange(newText: String?): Boolean {
+                try {
+                    carAdapter.fromModel = true
+                    carAdapter.fromMake = false
+                    carAdapter.filter.filter(newText)
+                    carAdapter.notifyDataSetChanged()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                return false
+            }
+
+        })
+
         setRecyclerView()
         getData()
 
@@ -80,21 +142,6 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             adapter = carAdapter
             carAdapter.notifyDataSetChanged()
         }
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        carAdapter.filter.filter(query)
-        carAdapter.notifyDataSetChanged()
-        return false
-
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onQueryTextChange(newText: String?): Boolean {
-        carAdapter.filter.filter(newText)
-        carAdapter.notifyDataSetChanged()
-        return false
     }
 
 

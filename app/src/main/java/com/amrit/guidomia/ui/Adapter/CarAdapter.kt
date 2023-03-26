@@ -15,6 +15,8 @@ import com.amrit.guidomia.databinding.LayoutCarItemBinding
 
 class CarAdapter : RecyclerView.Adapter<CarAdapter.ViewHolder>(), Filterable {
 
+    var fromMake: Boolean = false
+    var fromModel: Boolean = false
     private var previousExpandedPosition: Int = -1
     private var mExpanded = -1
     lateinit var carList: List<CarTableDetail>
@@ -118,13 +120,19 @@ class CarAdapter : RecyclerView.Adapter<CarAdapter.ViewHolder>(), Filterable {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val filterString = constraint?.toString() ?: ""
+
                 carFilteredList = if (filterString.isEmpty()) carList else {
                     val filteredList = ArrayList<CarTableDetail>()
                     carList
                         .filter {
-                            it.make.lowercase()
-                                .startsWith(filterString.lowercase()) || it.model.lowercase()
-                                .startsWith(filterString.lowercase())
+                            if (fromMake) {
+                                it.make.lowercase()
+                                    .startsWith(filterString.lowercase())
+                            } else {
+                                it.model.lowercase()
+                                    .startsWith(filterString.lowercase())
+                            }
+
                         }
                         .forEach { filteredList.add(it) }
                     filteredList
